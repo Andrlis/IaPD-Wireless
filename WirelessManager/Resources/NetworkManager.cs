@@ -20,7 +20,7 @@ namespace WirelessManager.Resources
 
                 foreach (var accessPoint in wifi.GetAccessPoints())
                 {
-                    answer.Add(new NetworkConnection(accessPoint, GetMacAddress(bssids, accessPoint)));
+                    answer.Add(new NetworkConnection(accessPoint, GetMacAddress(bssids, accessPoint), GetAuthType(bssids, accessPoint)));
                 }
             }
             catch (System.ComponentModel.Win32Exception)
@@ -41,7 +41,7 @@ namespace WirelessManager.Resources
                 {
                     CreateNoWindow = true,
                     FileName = "cmd",
-                    Arguments = @"/C ""netsh wlan show networks mode=bssid | findstr SSID""",
+                    Arguments = @"/C ""netsh wlan show networks mode=bssid""",
                     RedirectStandardOutput = true,
                     UseShellExecute = false
                 }
@@ -59,7 +59,20 @@ namespace WirelessManager.Resources
             {
                 if ((bssids[i].Split(':')[0].Contains("SSID") && accessPoint.Name.Equals(bssids[i].Split(':')[1])))
                 {
-                    return bssids[i + 1].Remove(0, bssids[i + 1].IndexOf(":") + 1);
+                    return bssids[i + 4].Remove(0, bssids[i + 4].IndexOf(":") + 1);
+                }
+            }
+            return null;
+        }
+
+        static private string GetAuthType(string[] bssids, AccessPoint accessPoint)
+        {
+            for (int i = 0; i < bssids.Length; i++)
+            {
+                if ((bssids[i].Split(':')[0].Contains("SSID") && accessPoint.Name.Equals(bssids[i].Split(':')[1])))
+                {
+                    string str = bssids[i + 2].Remove(0, bssids[i + 2].IndexOf(":") + 1);
+                    return bssids[i + 2].Remove(0, bssids[i + 2].IndexOf(":") + 1);
                 }
             }
             return null;
